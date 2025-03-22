@@ -1,0 +1,35 @@
+{
+  "name": "ipl-scorekeeper",
+  "version": "1.0.0",
+  "description": "A scorekeeper for the ipl for online users",
+  "main": "server.js",
+  "scripts": {
+    "deploy": "cd ../frontend && npm install && npm run build && cd ../backend && npm run dev",
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "author": "DragonRider01598",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "keywords": [
+    "IPL",
+    "scorekeeper",
+    "cricket",
+    "sports",
+    "live scores"
+  ],
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-validator": "^7.2.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.12.1",
+    "nodemon": "^3.1.9",
+    "path": "^0.12.7"
+  }
+}
