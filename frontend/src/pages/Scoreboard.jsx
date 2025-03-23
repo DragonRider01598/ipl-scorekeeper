@@ -58,9 +58,9 @@ export default function Scoreboard() {
                 <table className="w-full border-collapse">
                   <thead>
                     <tr className="bg-gray-700/50 text-gray-300">
-                      <th className="sticky top-0 bg-gray-700/50 backdrop-blur-sm px-6 py-4 text-left font-bold text-lg">Rank</th>
-                      <th className="sticky top-0 bg-gray-700/50 backdrop-blur-sm px-6 py-4 text-left font-bold text-lg">Player</th>
-                      <th className="sticky top-0 bg-gray-700/50 backdrop-blur-sm px-6 py-4 text-right font-bold text-lg">Score</th>
+                      <th className="sticky top-0 bg-gray-700/50 backdrop-blur-sm px-3 py-2 text-left font-bold text-sm md:text-base">Rank</th>
+                      <th className="sticky top-0 bg-gray-700/50 backdrop-blur-sm px-3 py-2 text-left font-bold text-sm md:text-base">Player</th>
+                      <th className="sticky top-0 bg-gray-700/50 backdrop-blur-sm px-3 py-2 text-right font-bold text-sm md:text-base">Score</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-700/50">
@@ -69,57 +69,57 @@ export default function Scoreboard() {
                         <tr
                           key={player.userId}
                           className={`group transition-all duration-200 hover:bg-gray-700/30 ${index === 0 ? "bg-yellow-500/10" :
-                              index === 1 ? "bg-gray-400/10" :
-                                index === 2 ? "bg-amber-600/10" :
-                                  "bg-gray-700/10"
+                            index === 1 ? "bg-gray-400/10" :
+                              index === 2 ? "bg-amber-600/10" :
+                                "bg-gray-700/10"
                             }`}
                         >
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-2">
+                          <td className="px-3 py-2">
+                            <div className="flex items-center gap-1 md:gap-2">
                               {getRankIcon(index + 1)}
-                              <span className={`text-xl font-bold ${index === 0 ? "text-yellow-400" :
-                                  index === 1 ? "text-gray-300" :
-                                    index === 2 ? "text-amber-600" : "text-gray-400"
+                              <span className={`text-sm md:text-lg font-bold ${index === 0 ? "text-yellow-400" :
+                                index === 1 ? "text-gray-300" :
+                                  index === 2 ? "text-amber-600" : "text-gray-400"
                                 }`}>
                                 #{index + 1}
                               </span>
                             </div>
                           </td>
-                          <td className="px-6 py-4">
+                          <td className="px-3 py-2">
                             <div className="flex items-center">
-                              <div className={`h-10 w-10 rounded-full flex items-center justify-center text-white font-bold mr-3 text-lg ${index === 0 ? "bg-gradient-to-br from-yellow-400 to-amber-600" :
-                                  index === 1 ? "bg-gradient-to-br from-gray-300 to-gray-500" :
-                                    index === 2 ? "bg-gradient-to-br from-amber-600 to-amber-800" :
-                                      "bg-gradient-to-br from-blue-500 to-purple-600"
+                              <div className={`h-8 w-8 md:h-10 md:w-10 rounded-full flex items-center justify-center text-white font-bold mr-2 md:mr-3 text-sm md:text-lg ${index === 0 ? "bg-gradient-to-br from-yellow-400 to-amber-600" :
+                                index === 1 ? "bg-gradient-to-br from-gray-300 to-gray-500" :
+                                  index === 2 ? "bg-gradient-to-br from-amber-600 to-amber-800" :
+                                    "bg-gradient-to-br from-blue-500 to-purple-600"
                                 }`}>
                                 {player.username.charAt(0).toUpperCase()}
                               </div>
-                              <span className="text-white font-medium text-lg group-hover:text-blue-400 transition-colors duration-200">
+                              <span className="text-white font-medium text-sm md:text-base group-hover:text-blue-400 transition-colors duration-200">
                                 {player.username}
                               </span>
                             </div>
                           </td>
-                          <td className="px-6 py-4 text-right">
-                            <div className={`inline-flex items-center px-4 py-2 rounded-full ${index === 0 ? "bg-yellow-500/20 text-yellow-400" :
-                                index === 1 ? "bg-gray-500/20 text-gray-300" :
-                                  index === 2 ? "bg-amber-600/20 text-amber-500" :
-                                    "bg-blue-500/20 text-blue-400"
+                          <td className="px-3 py-2 text-right">
+                            <div className={`inline-flex items-center px-3 py-1 md:px-4 md:py-2 rounded-full ${index === 0 ? "bg-yellow-500/20 text-yellow-400" :
+                              index === 1 ? "bg-gray-500/20 text-gray-300" :
+                                index === 2 ? "bg-amber-600/20 text-amber-500" :
+                                  "bg-blue-500/20 text-blue-400"
                               }`}>
-                              <span className="text-2xl font-bold mr-1">
+                              <span className="text-base md:text-2xl font-bold mr-1">
                                 {player.totalScore.toLocaleString()}
                               </span>
-                              <span className="text-sm opacity-75">pts</span>
+                              <span className="text-xs md:text-sm opacity-75">pts</span>
                             </div>
                           </td>
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={3} className="px-6 py-8 text-center text-gray-400">
-                          <div className="flex flex-col items-center gap-2">
-                            <Trophy className="h-8 w-8 text-gray-600" />
-                            <p>No scores available yet.</p>
-                            <p className="text-sm">Be the first to make it to the leaderboard!</p>
+                        <td colSpan={3} className="px-3 py-6 md:px-6 md:py-8 text-center text-gray-400">
+                          <div className="flex flex-col items-center gap-1 md:gap-2">
+                            <Trophy className="h-6 w-6 md:h-8 md:w-8 text-gray-600" />
+                            <p className="text-sm md:text-base">No scores available yet.</p>
+                            <p className="text-xs md:text-sm">Be the first to make it to the leaderboard!</p>
                           </div>
                         </td>
                       </tr>

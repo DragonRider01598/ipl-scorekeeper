@@ -53,6 +53,7 @@ const MatchPrediction = () => {
             withCredentials: true,
          });
          const now = new Date();
+         now.setMinutes(now.getMinutes() + 30);
          setMatches(data.filter((match) => new Date(match.matchDate) >= now));
          setPastMatches(data.filter((match) => new Date(match.matchDate) < now));
       } catch (error) {
