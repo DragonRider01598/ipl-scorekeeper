@@ -39,6 +39,7 @@ router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
       let matchDateTime = new Date(matchDate);
       const [hours, minutes] = matchTime.split(":").map(Number);
       matchDateTime.setHours(hours, minutes, 0, 0);
+      matchDateTime = new Date(matchDateTime.getTime() - (5.5 * 60 * 60 * 1000));
       const match = new Match({
          teamOne,
          teamTwo,
