@@ -73,7 +73,7 @@ function Navbar() {
                 </Link>
                 <Link
                   to="/register"
-                  className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-blue-400 hover:bg-blue-500 hover:text-white transition-colors duration-200 bg-blue-500/10 rounded-md"
+                  className="flex items-center px-3 py-2 text-sm font-medium text-blue-400 hover:bg-blue-500 hover:text-white transition-colors duration-200 bg-blue-500/10 rounded-md"
                 >
                   <UserPlus className="h-4 w-4 mr-1" />
                   Register
@@ -117,13 +117,16 @@ function Navbar() {
               <Trophy className="h-5 w-5 mr-2" />
               Scoreboard
             </Link>
-            <Link
-              to="/match-prediction"
-              className="flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-            >
-              <Crystal className="h-5 w-5 mr-2" />
-              Match Prediction
-            </Link>
+
+            {user && (
+              <Link
+                to="/match-prediction"
+                className="flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+              >
+                <Crystal className="h-5 w-5 mr-2" />
+                Match Prediction
+              </Link>
+            )}
 
             {isAdmin && (
               <Link

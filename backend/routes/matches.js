@@ -26,7 +26,6 @@ router.get('/', authMiddleware, async (req, res) => {
 
       res.json(matchesWithPredictions);
    } catch (error) {
-      console.log(error)
       res.status(500).json({ message: error.message });
    }
 });
@@ -37,11 +36,13 @@ router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
    const { teamOne, teamTwo, matchDate, matchTime, additionalDetails, teamOneImage, teamTwoImage } = req.body;
 
    try {
+      let matchDateTime = new Date(matchDate);
+      const [hours, minutes] = matchTime.split(":").map(Number);
+      matchDateTime.setHours(hours, minutes, 0, 0);
       const match = new Match({
          teamOne,
          teamTwo,
-         matchDate,
-         matchTime,
+         matchDate: matchDateTime,
          additionalDetails,
          teamOneImage,
          teamTwoImage,

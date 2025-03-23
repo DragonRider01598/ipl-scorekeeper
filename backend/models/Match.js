@@ -6,7 +6,6 @@ const MatchSchema = new mongoose.Schema(
     teamOne: { type: String, required: true },
     teamTwo: { type: String, required: true },
     matchDate: { type: Date, required: true },
-    matchTime: { type: String, required: true },
     teamOneImage: { type: String }, // URL for team image
     teamTwoImage: { type: String }, // URL for team image
     additionalDetails: { type: String },

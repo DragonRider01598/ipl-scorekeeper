@@ -41,9 +41,6 @@ router.post('/', authMiddleware, async (req, res) => {
     if (!match) return res.status(404).json({ message: 'Match not found' });
 
     const matchStart = new Date(match.matchDate);
-    // Combine matchDate and matchTime if needed (assuming matchTime is HH:MM)
-    const [hours, minutes] = match.matchTime.split(':');
-    matchStart.setHours(hours, minutes);
 
     // Check if current time is at least 1 hour before match start
     const now = new Date();

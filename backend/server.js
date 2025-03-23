@@ -5,6 +5,11 @@ require('dotenv').config();
 
 const app = express();
 
+if (process.env.NODE_ENV === "development") {
+  const cors = require('cors');
+  app.use(cors());
+}
+
 // middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
