@@ -54,8 +54,23 @@ const MatchPrediction = () => {
          });
          const now = new Date();
          now.setMinutes(now.getMinutes() + 30);
-         setMatches(data.filter((match) => new Date(match.matchDate) >= now));
-         setPastMatches(data.filter((match) => new Date(match.matchDate) < now));
+         const formattedMatches = Array.isArray(data)
+            ? data.map((match) => ({
+               ...match,
+               dateString: match.matchDate,
+               matchDate: new Date(match.matchDate).toLocaleString("en-US", {
+                  weekday: "long",
+                  month: "long",
+                  day: "2-digit",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: true,
+               }),
+            }))
+            : [];
+         setMatches(formattedMatches.filter((match) => new Date(match.dateString) >= now));
+         setPastMatches(formattedMatches.filter((match) => new Date(match.dateString) < now));
       } catch (error) {
          console.error("Error fetching matches:", error);
       }
@@ -116,7 +131,7 @@ const MatchPrediction = () => {
                               onClick={() => handleMatchSelection(match)}
                            >
                               <div className="font-medium text-lg">{match.teamOne} vs {match.teamTwo}</div>
-                              <div className="text-sm text-gray-400">{new Date(match.matchDate).toLocaleString()}</div>
+                              <div className="text-sm text-gray-400">{match.matchDate}</div>
                               {activeTab === "upcoming" && (
                                  <div className="text-sm text-yellow-400">Your Prediction: {match.userPrediction || "None selected"}</div>
                               )}
@@ -153,8 +168,6 @@ const MatchPrediction = () => {
                               {selectedMatch === match && activeTab === "upcoming" && (
                                  <div className="bg-gray-800 rounded-xl shadow-lg overflow-hidden mt-6 p-6">
                                     <h2 className="text-xl font-semibold">Make Your Prediction</h2>
-                                    <div className="text-lg font-medium my-4">{selectedMatch.teamOne} vs {selectedMatch.teamTwo}</div>
-                                    <div className="text-sm text-gray-400">Match Date & Time: {new Date(selectedMatch.matchDate).toLocaleString()}</div>
                                     <select
                                        className="w-full p-2 bg-gray-700 border border-gray-600 rounded-lg mt-4"
                                        value={prediction}
@@ -182,8 +195,6 @@ const MatchPrediction = () => {
                   )}
                </div>
             </div>
-
-
          </div>
       </div>
    );
