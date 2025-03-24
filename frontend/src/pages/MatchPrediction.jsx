@@ -11,6 +11,19 @@ const MatchPrediction = () => {
    const [activeTab, setActiveTab] = useState("upcoming");
    const [matchPredictions, setMatchPredictions] = useState([]);
 
+   const logo = {
+      "CSK": "https://documents.iplt20.com/ipl/CSK/logos/Logooutline/CSKoutline.png",
+      "DC": "https://documents.iplt20.com/ipl/DC/Logos/LogoOutline/DCoutline.png",
+      "GT": "https://documents.iplt20.com/ipl/GT/Logos/Logooutline/GToutline.png",
+      "KKR": "https://documents.iplt20.com/ipl/KKR/Logos/Logooutline/KKRoutline.png",
+      "LSG": "https://documents.iplt20.com/ipl/LSG/Logos/Logooutline/LSGoutline.png",
+      "MI": "https://documents.iplt20.com/ipl/MI/Logos/Logooutline/MIoutline.png",
+      "PBK": "https://documents.iplt20.com/ipl/PBKS/Logos/Logooutline/PBKSoutline.png",
+      "RR": "https://documents.iplt20.com/ipl/RR/Logos/Logooutline/RRoutline.png",
+      "RCB": "https://documents.iplt20.com/ipl/RCB/Logos/Logooutline/RCBoutline.png",
+      "SRH": "https://documents.iplt20.com/ipl/SRH/Logos/Logooutline/SRHoutline.png"
+   }
+
    useEffect(() => {
       fetchMatches();
    }, []);
@@ -125,18 +138,31 @@ const MatchPrediction = () => {
                   {(activeTab === "upcoming" ? matches : pastMatches).length > 0 ? (
                      (activeTab === "upcoming" ? matches : pastMatches).map((match) => {
                         return (
-                           <div
-                              key={match._id}
-                              className="p-4 flex flex-col gap-2 bg-gray-700 rounded-lg"
-                              onClick={() => handleMatchSelection(match)}
-                           >
-                              <div className="font-medium text-lg">{match.teamOne} vs {match.teamTwo}</div>
-                              <div className="text-sm text-gray-400">{match.matchDate}</div>
+                           <div key={match._id} onClick={() => handleMatchSelection(match)} className="p-4 bg-gray-700 rounded-lg">
+                              {/* Teams Section with Logos */}
+                              <div className="flex items-center justify-center">
+                                 <div className="flex items-center gap-3">
+                                    <img src={logo[match.teamOne]} alt={match.teamOne} className="w-10 h-10" />
+                                    <span className="text-lg font-semibold">{match.teamOne}</span>
+                                 </div>
+                                 <span className="text-gray-400 px-5">vs</span>
+                                 <div className="flex items-center gap-3">
+                                    <span className="text-lg font-semibold">{match.teamTwo}</span>
+                                    <img src={logo[match.teamTwo]} alt={match.teamTwo} className="w-10 h-10" />
+                                 </div>
+                              </div>
+
+                              {/* Match Date */}
+                              <div className="text-sm text-gray-400 text-center mt-2">{match.matchDate}</div>
+
+                              {/* Prediction Info */}
                               {activeTab === "upcoming" && (
-                                 <div className="text-sm text-yellow-400">Your Prediction: {match.userPrediction || "None selected"}</div>
+                                 <div className="text-sm text-yellow-400 text-center mt-2">
+                                    Your Prediction: {match.userPrediction || "None selected"}
+                                 </div>
                               )}
                               {activeTab === "past" && (
-                                 <div className="text-sm">
+                                 <div className="text-sm text-center mt-2">
                                     <p className="text-gray-300">Your Prediction: <span className={match.userPrediction === match.declaredWinner ? "text-green-500" : "text-red-500"}>{match.userPrediction || "None selected"}</span></p>
                                     <p className="text-gray-300">Match Winner: <span className="text-yellow-500">{match.declaredWinner || "Not yet declared"}</span></p>
                                  </div>

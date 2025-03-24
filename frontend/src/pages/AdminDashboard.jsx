@@ -15,6 +15,19 @@ const AdminMatchPanel = () => {
     additionalDetails: "",
   });
 
+  const logo = {
+    "CSK": "https://documents.iplt20.com/ipl/CSK/logos/Logooutline/CSKoutline.png",
+    "DC": "https://documents.iplt20.com/ipl/DC/Logos/LogoOutline/DCoutline.png",
+    "GT": "https://documents.iplt20.com/ipl/GT/Logos/Logooutline/GToutline.png",
+    "KKR": "https://documents.iplt20.com/ipl/KKR/Logos/Logooutline/KKRoutline.png",
+    "LSG": "https://documents.iplt20.com/ipl/LSG/Logos/Logooutline/LSGoutline.png",
+    "MI": "https://documents.iplt20.com/ipl/MI/Logos/Logooutline/MIoutline.png",
+    "PBK": "https://documents.iplt20.com/ipl/PBKS/Logos/Logooutline/PBKSoutline.png",
+    "RR": "https://documents.iplt20.com/ipl/RR/Logos/Logooutline/RRoutline.png",
+    "RCB": "https://documents.iplt20.com/ipl/RCB/Logos/Logooutline/RCBoutline.png",
+    "SRH": "https://documents.iplt20.com/ipl/SRH/Logos/Logooutline/SRHoutline.png"
+  }
+
   useEffect(() => {
     fetchMatches();
   }, []);
@@ -139,8 +152,21 @@ const AdminMatchPanel = () => {
         {matches.length > 0 ? (
           <ul className="space-y-4">
             {matches.map(match => (
-              <li key={match._id} className="p-4 bg-gray-700 rounded flex flex-col gap-2">
-                <p className="text-lg font-semibold">{match.teamOne} vs {match.teamTwo}</p>
+              <li key={match._id} className="p-4 bg-gray-700 rounded flex flex-col gap-2 items-center">
+                {/* Match Title with Logos */}
+                <div className="flex items-center gap-5">
+                  <div className="flex items-center gap-2">
+                    <img src={logo[match.teamOne]} alt={match.teamOne} className="w-8 h-8 rounded-full" />
+                    <p className="text-lg font-semibold">{match.teamOne}</p>
+                  </div>
+                  <p className="text-lg font-semibold">vs</p>
+                  <div className="flex items-center gap-2">
+                    <img src={logo[match.teamTwo]} alt={match.teamTwo} className="w-8 h-8 rounded-full" />
+                    <p className="text-lg font-semibold">{match.teamTwo}</p>
+                  </div>
+                </div>
+
+                {/* Match Date */}
                 <p>{match.matchDate}</p>
 
                 {/* If winner is declared, show winner and Edit button */}
@@ -179,14 +205,16 @@ const AdminMatchPanel = () => {
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleDeclareWinner(match._id, match.teamOne)}
-                      className="bg-green-800 hover:bg-green-900 text-white font-bold py-1 px-4 rounded"
+                      className="bg-green-800 hover:bg-green-900 text-white font-bold py-1 px-4 rounded flex items-center gap-2"
                     >
+                      <img src={logo[match.teamOne]} alt={match.teamOne} className="w-6 h-6 rounded-full" />
                       {match.teamOne} Wins
                     </button>
                     <button
                       onClick={() => handleDeclareWinner(match._id, match.teamTwo)}
-                      className="bg-red-800 hover:bg-red-900 text-white font-bold py-1 px-4 rounded"
+                      className="bg-red-800 hover:bg-red-900 text-white font-bold py-1 px-4 rounded flex items-center gap-2"
                     >
+                      <img src={logo[match.teamTwo]} alt={match.teamTwo} className="w-6 h-6 rounded-full" />
                       {match.teamTwo} Wins
                     </button>
                   </div>
@@ -194,6 +222,7 @@ const AdminMatchPanel = () => {
               </li>
             ))}
           </ul>
+
         ) : (
           <p className="text-gray-400">No matches available</p>
         )}
