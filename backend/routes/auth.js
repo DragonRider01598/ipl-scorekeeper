@@ -13,7 +13,6 @@ router.post(
       body('username').notEmpty().withMessage('Username is required'),
       body('email').isEmail().withMessage('Invalid email format').normalizeEmail(),
       body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-      body('role').optional().isIn(['user', 'admin']).withMessage('Invalid role'),
    ],
    async (req, res) => {
       const errors = validationResult(req);
@@ -21,23 +20,22 @@ router.post(
          return res.status(400).json({ errors: errors.array() });
       }
 
-      const { username, email, password, role = 'user' } = req.body;
-
+      const { username, email, password } = req.body;
       try {
          let user = await User.findOne({ email: email.toLowerCase() });
-         if (user) return res.status(400).json({ message: 'User already exists' });
+         if (user) return res.status(400).json({ msg: 'User already exists' });
 
          // Create new user
-         user = new User({ username, email: email.toLowerCase(), password, role });
+         user = new User({ username, email: email.toLowerCase(), password });
 
          // Hash password
          const salt = await bcrypt.genSalt(12);
          user.password = await bcrypt.hash(password, salt);
          await user.save();
 
-         res.status(201).json({ message: 'User registered successfully' });
+         res.status(201).json({ msg: 'User registered successfully' });
       } catch (error) {
-         res.status(500).json({ message: error.message });
+         res.status(500).json({ msg: error.message });
       }
    }
 );
@@ -59,10 +57,10 @@ router.post(
 
       try {
          const user = await User.findOne({ email: email.toLowerCase() });
-         if (!user) return res.status(400).json({ message: 'Invalid credentials' });
+         if (!user) return res.status(400).json({ msg: 'Invalid credentials' });
 
          const isMatch = await bcrypt.compare(password, user.password);
-         if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+         if (!isMatch) return res.status(400).json({ msg: 'Invalid credentials' });
 
          // Generate JWT Token
          const payload = { id: user._id, username: user.username, role: user.role };
@@ -71,19 +69,19 @@ router.post(
 
          res.json({ token });
       } catch (error) {
-         res.status(500).json({ message: error.message });
+         res.status(500).json({ msg: error.message });
       }
    }
 );
 router.get('/verify', async (req, res) => {
    const token = req.headers.authorization && req.headers.authorization.split(" ")[1];
-   if (!token) return res.status(401).json({ message: "No token, authorization denied" });
+   if (!token) return res.status(401).json({ msg: "No token, authorization denied" });
 
    try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       res.json({ valid: true, user: decoded });
    } catch (error) {
-      res.status(401).json({ valid: false, message: "Token is not valid" });
+      res.status(401).json({ valid: false, msg: "Token is not valid" });
    }
 });
 

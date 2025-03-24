@@ -27,7 +27,7 @@ router.get('/:matchId', async (req, res) => {
 
     res.json(grouped);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ msg: error.message });
   }
 });
 
@@ -38,14 +38,14 @@ router.post('/', authMiddleware, async (req, res) => {
   try {
     // Find the match to check time restrictions
     const match = await Match.findById(matchId);
-    if (!match) return res.status(404).json({ message: 'Match not found' });
+    if (!match) return res.status(404).json({ msg: 'Match not found' });
 
     const matchStart = new Date(match.matchDate);
 
     // Check if current time is at least 1 hour before match start
     const now = new Date();
     if (now > new Date(matchStart.getTime() - 30 * 60 * 1000)) {
-      return res.status(400).json({ message: 'Prediction closed for this match' });
+      return res.status(400).json({ msg: 'Prediction closed for this match' });
     }
 
     // Check if a prediction already exists for this user and match
@@ -54,7 +54,7 @@ router.post('/', authMiddleware, async (req, res) => {
       // Update existing prediction if needed
       scoreEntry.prediction = prediction;
       await scoreEntry.save();
-      return res.json({ message: 'Prediction updated', scoreEntry });
+      return res.json({ msg: 'Prediction updated', scoreEntry });
     }
 
     // Create new prediction entry
@@ -64,9 +64,9 @@ router.post('/', authMiddleware, async (req, res) => {
       prediction,
     });
     await scoreEntry.save();
-    res.status(201).json({ message: 'Prediction submitted', scoreEntry });
+    res.status(201).json({ msg: 'Prediction submitted', scoreEntry });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ msg: error.message });
   }
 });
 

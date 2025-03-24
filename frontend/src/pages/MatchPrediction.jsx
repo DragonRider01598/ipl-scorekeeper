@@ -44,11 +44,11 @@ const MatchPrediction = () => {
                withCredentials: true,
             }
          );
-         alert(response.data.message); // Show success message
+         alert(response.data.msg); // Show success message
          setSelectedMatch(null);
          window.location.reload();
       } catch (error) {
-         alert(error);
+         alert(response.data.msg);
       } finally {
          setLoading(false);
       }

@@ -26,7 +26,7 @@ router.get('/', authMiddleware, async (req, res) => {
 
       res.json(matchesWithPredictions);
    } catch (error) {
-      res.status(500).json({ message: error.message });
+      res.status(500).json({ msg: error.message });
    }
 });
 
@@ -49,9 +49,9 @@ router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
          teamTwoImage,
       });
       await match.save();
-      res.status(201).json({ message: 'Match added successfully', match });
+      res.status(201).json({ msg: 'Match added successfully', match });
    } catch (error) {
-      res.status(500).json({ message: error.message });
+      res.status(500).json({ msg: error.message });
    }
 });
 
@@ -61,12 +61,12 @@ router.put('/declare/:matchId', authMiddleware, adminMiddleware, async (req, res
    const { declaredWinner } = req.body;
    try {
       const match = await Match.findById(matchId);
-      if (!match) return res.status(404).json({ message: 'Match not found' });
+      if (!match) return res.status(404).json({ msg: 'Match not found' });
       match.declaredWinner = declaredWinner;
       await match.save();
-      res.json({ message: 'Winner declared successfully', match });
+      res.json({ msg: 'Winner declared successfully', match });
    } catch (error) {
-      res.status(500).json({ message: error.message });
+      res.status(500).json({ msg: error.message });
    }
 });
 

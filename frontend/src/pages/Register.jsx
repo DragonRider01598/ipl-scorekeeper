@@ -31,7 +31,7 @@ const Register = () => {
         alert("Registration successful! Please login.");
         navigate("/login");
       } else {
-        alert(data.message);
+        alert(data.errors[0].msg);
       }
     } catch (error) {
       console.error("Registration error:", error);
