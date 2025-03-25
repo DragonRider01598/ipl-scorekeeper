@@ -3,13 +3,11 @@ const Score = require("./Score");
 
 const MatchSchema = new mongoose.Schema(
   {
-    teamOne: { type: String, required: true },
-    teamTwo: { type: String, required: true },
+    teamOne: { type: mongoose.Schema.Types.ObjectId, ref: 'Team', required: true },
+    teamTwo: { type: mongoose.Schema.Types.ObjectId, ref: 'Team', required: true },
     matchDate: { type: Date, required: true },
-    teamOneImage: { type: String }, // URL for team image
-    teamTwoImage: { type: String }, // URL for team image
     additionalDetails: { type: String },
-    declaredWinner: { type: String }, // Admin sets the winning team
+    declaredWinner: { type: mongoose.Schema.Types.ObjectId, ref: 'Team' }, // Admin sets the winning team
   },
   { timestamps: true }
 );

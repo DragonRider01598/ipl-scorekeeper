@@ -3,6 +3,7 @@ import axios from "axios";
 
 const AdminMatchPanel = () => {
   const [matches, setMatches] = useState([]);
+  const [teams, setTeams] = useState([]);
   const [editingMatchId, setEditingMatchId] = useState(null);
   const [editedWinner, setEditedWinner] = useState('');
   const [newMatch, setNewMatch] = useState({
@@ -10,26 +11,17 @@ const AdminMatchPanel = () => {
     teamTwo: "",
     matchDate: "",
     matchTime: "",
-    teamOneImage: "",
-    teamTwoImage: "",
     additionalDetails: "",
   });
-
-  const logo = {
-    "CSK": "https://documents.iplt20.com/ipl/CSK/logos/Logooutline/CSKoutline.png",
-    "DC": "https://documents.iplt20.com/ipl/DC/Logos/LogoOutline/DCoutline.png",
-    "GT": "https://documents.iplt20.com/ipl/GT/Logos/Logooutline/GToutline.png",
-    "KKR": "https://documents.iplt20.com/ipl/KKR/Logos/Logooutline/KKRoutline.png",
-    "LSG": "https://documents.iplt20.com/ipl/LSG/Logos/Logooutline/LSGoutline.png",
-    "MI": "https://documents.iplt20.com/ipl/MI/Logos/Logooutline/MIoutline.png",
-    "PBKS": "https://documents.iplt20.com/ipl/PBKS/Logos/Logooutline/PBKSoutline.png",
-    "RR": "https://documents.iplt20.com/ipl/RR/Logos/Logooutline/RRoutline.png",
-    "RCB": "https://documents.iplt20.com/ipl/RCB/Logos/Logooutline/RCBoutline.png",
-    "SRH": "https://documents.iplt20.com/ipl/SRH/Logos/Logooutline/SRHoutline.png"
-  }
+  const [newTeam, setNewTeam] = useState({
+    teamName: "",
+    imageUrl: "",
+    additionalDetails: ""
+  });
 
   useEffect(() => {
     fetchMatches();
+    fetchTeams();
   }, []);
 
   const fetchMatches = async () => {
@@ -38,26 +30,19 @@ const AdminMatchPanel = () => {
       const res = await axios.get("/api/matches", {
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      const formattedMatches = Array.isArray(res.data)
-        ? res.data.map((match) => ({
-          ...match,
-          matchDate: new Date(match.matchDate).toLocaleString("en-US", {
-            weekday: "long",
-            month: "long",
-            day: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true,
-          }),
-        }))
-        : [];
-
-      setMatches(formattedMatches);
+      setMatches(res.data);
     } catch (error) {
       console.error("Error fetching matches:", error);
       setMatches([]);
+    }
+  };
+
+  const fetchTeams = async () => {
+    try {
+      const res = await axios.get("/api/teams");
+      setTeams(res.data);
+    } catch (error) {
+      console.error("Error fetching teams:", error);
     }
   };
 
@@ -74,28 +59,23 @@ const AdminMatchPanel = () => {
           Authorization: `Bearer ${token}`,
         },
       });
+      alert("Match added successfully!");
+      window.location.reload();
       fetchMatches();
     } catch (error) {
       console.error("Error adding match:", error);
     }
   };
 
-  const handleDeclareWinner = async (matchId, winner) => {
+  const handleAddTeam = async () => {
     try {
-      const token = localStorage.getItem("token");
-      await axios.put(`/api/matches/declare/${matchId}`, { declaredWinner: winner }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      fetchMatches();
-      setEditingMatchId(null);
+      await axios.post("/api/teams", newTeam);
+      alert("Team successfuly added!")
+      fetchTeams();
+      window.location.reload();
     } catch (error) {
-      console.error('Error declaring winner:', error);
+      console.error("Error adding team:", error);
     }
-  };
-
-  const handleEditWinner = (matchId, currentWinner) => {
-    setEditingMatchId(matchId);
-    setEditedWinner(currentWinner);
   };
 
   return (
@@ -110,22 +90,20 @@ const AdminMatchPanel = () => {
             name="teamOne"
             className="p-2 bg-gray-700 rounded text-white"
             onChange={handleInputChange}
-            value={newMatch.teamOne}
           >
             <option value="">Select Team One</option>
-            {Object.keys(logo).map((team) => (
-              <option key={team} value={team}>{team}</option>
+            {teams.map(team => (
+              <option key={team.teamName} value={team.teamName}>{team.teamName}</option>
             ))}
           </select>
           <select
             name="teamTwo"
             className="p-2 bg-gray-700 rounded text-white"
             onChange={handleInputChange}
-            value={newMatch.teamTwo}
           >
             <option value="">Select Team Two</option>
-            {Object.keys(logo).map((team) => (
-              <option key={team} value={team}>{team}</option>
+            {teams.map(team => (
+              <option key={team.teamName} value={team.teamName}>{team.teamName}</option>
             ))}
           </select>
           <input
@@ -155,6 +133,36 @@ const AdminMatchPanel = () => {
         </button>
       </div>
 
+      {/* Add Team Section */}
+      <div className="bg-gray-800 p-6 rounded-lg shadow-md mb-6">
+        <h3 className="text-xl font-semibold mb-4">Add Team</h3>
+        <input
+          type="text"
+          name="teamName"
+          placeholder="Team Name"
+          className="p-2 bg-gray-700 rounded text-white w-full"
+          onChange={(e) => setNewTeam({ ...newTeam, teamName: e.target.value })}
+        />
+        <input
+          type="text"
+          name="imageUrl"
+          placeholder="Image URL"
+          className="p-2 bg-gray-700 rounded text-white w-full mt-4"
+          onChange={(e) => setNewTeam({ ...newTeam, imageUrl: e.target.value })}
+        />
+        <textarea
+          name="additionalDetails"
+          placeholder="Additional Details"
+          className="w-full p-2 bg-gray-700 rounded text-white mt-4"
+          onChange={(e) => setNewTeam({ ...newTeam, additionalDetails: e.target.value })}
+        ></textarea>
+        <button
+          onClick={handleAddTeam}
+          className="mt-4 bg-green-800 hover:bg-green-900 text-white font-bold py-2 px-4 rounded"
+        >
+          Add Team
+        </button>
+      </div>
       <div className="bg-gray-800 p-6 rounded-lg shadow-md">
         <h3 className="text-xl font-semibold mb-4">Existing Matches</h3>
         {matches.length > 0 ? (
