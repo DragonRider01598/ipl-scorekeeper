@@ -22,7 +22,7 @@ const AdminMatchPanel = () => {
     "KKR": "https://documents.iplt20.com/ipl/KKR/Logos/Logooutline/KKRoutline.png",
     "LSG": "https://documents.iplt20.com/ipl/LSG/Logos/Logooutline/LSGoutline.png",
     "MI": "https://documents.iplt20.com/ipl/MI/Logos/Logooutline/MIoutline.png",
-    "PBK": "https://documents.iplt20.com/ipl/PBKS/Logos/Logooutline/PBKSoutline.png",
+    "PBKS": "https://documents.iplt20.com/ipl/PBKS/Logos/Logooutline/PBKSoutline.png",
     "RR": "https://documents.iplt20.com/ipl/RR/Logos/Logooutline/RRoutline.png",
     "RCB": "https://documents.iplt20.com/ipl/RCB/Logos/Logooutline/RCBoutline.png",
     "SRH": "https://documents.iplt20.com/ipl/SRH/Logos/Logooutline/SRHoutline.png"
@@ -106,20 +106,28 @@ const AdminMatchPanel = () => {
       <div className="bg-gray-800 p-6 rounded-lg shadow-md mb-6">
         <h3 className="text-xl font-semibold mb-4">Add Match</h3>
         <div className="grid grid-cols-2 gap-4">
-          <input
-            type="text"
+          <select
             name="teamOne"
-            placeholder="Team One"
             className="p-2 bg-gray-700 rounded text-white"
             onChange={handleInputChange}
-          />
-          <input
-            type="text"
+            value={newMatch.teamOne}
+          >
+            <option value="">Select Team One</option>
+            {Object.keys(logo).map((team) => (
+              <option key={team} value={team}>{team}</option>
+            ))}
+          </select>
+          <select
             name="teamTwo"
-            placeholder="Team Two"
             className="p-2 bg-gray-700 rounded text-white"
             onChange={handleInputChange}
-          />
+            value={newMatch.teamTwo}
+          >
+            <option value="">Select Team Two</option>
+            {Object.keys(logo).map((team) => (
+              <option key={team} value={team}>{team}</option>
+            ))}
+          </select>
           <input
             type="date"
             name="matchDate"

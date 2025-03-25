@@ -18,7 +18,7 @@ const MatchPrediction = () => {
       "KKR": "https://documents.iplt20.com/ipl/KKR/Logos/Logooutline/KKRoutline.png",
       "LSG": "https://documents.iplt20.com/ipl/LSG/Logos/Logooutline/LSGoutline.png",
       "MI": "https://documents.iplt20.com/ipl/MI/Logos/Logooutline/MIoutline.png",
-      "PBK": "https://documents.iplt20.com/ipl/PBKS/Logos/Logooutline/PBKSoutline.png",
+      "PBKS": "https://documents.iplt20.com/ipl/PBKS/Logos/Logooutline/PBKSoutline.png",
       "RR": "https://documents.iplt20.com/ipl/RR/Logos/Logooutline/RRoutline.png",
       "RCB": "https://documents.iplt20.com/ipl/RCB/Logos/Logooutline/RCBoutline.png",
       "SRH": "https://documents.iplt20.com/ipl/SRH/Logos/Logooutline/SRHoutline.png"
