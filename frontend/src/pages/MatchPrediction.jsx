@@ -182,7 +182,7 @@ const MatchPrediction = () => {
                                              <tr key={team} className="text-center bg-gray-700">
                                                 <td className="border border-gray-600 px-4 py-2">{team}</td>
                                                 <td className="border border-gray-600 px-4 py-2">
-                                                   {users.length > 0 ? users.map(user => user.username).join(", ") : "No votes"}
+                                                   {users.length > 0 ? users.map(user => user.username.split(' ')[0]).join(", ") : "No votes"}
                                                 </td>
                                              </tr>
                                           ))}
