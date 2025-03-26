@@ -74,6 +74,7 @@ const AdminMatchPanel = () => {
           Authorization: `Bearer ${token}`,
         },
       });
+      alert("Match was added successfully!");
       fetchMatches();
     } catch (error) {
       console.error("Error adding match:", error);
