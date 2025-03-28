@@ -66,7 +66,7 @@ const MatchPrediction = () => {
             withCredentials: true,
          });
          const now = new Date();
-         now.setMinutes(now.getMinutes() + 30);
+         now.setMinutes(now.getMinutes());
          const formattedMatches = Array.isArray(data)
             ? data.map((match) => ({
                ...match,

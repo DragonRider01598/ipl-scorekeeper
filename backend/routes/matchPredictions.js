@@ -42,9 +42,9 @@ router.post('/', authMiddleware, async (req, res) => {
 
     const matchStart = new Date(match.matchDate);
 
-    // Check if current time is at least 1 hour before match start
+    // Check if current time is before match start
     const now = new Date();
-    if (now > new Date(matchStart.getTime() - 30 * 60 * 1000)) {
+    if (now > new Date(matchStart.getTime())) {
       return res.status(400).json({ msg: 'Prediction closed for this match' });
     }
 
