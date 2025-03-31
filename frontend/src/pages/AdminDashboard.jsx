@@ -6,9 +6,10 @@ const AdminMatchPanel = () => {
   const [teams, setTeams] = useState([]);
   const [editingMatchId, setEditingMatchId] = useState(null);
   const [editedWinner, setEditedWinner] = useState('');
+  const [activeTab, setActiveTab] = useState(localStorage.getItem('adminTab') || 'match');
   const [newMatch, setNewMatch] = useState({
-    teamOne: "",
-    teamTwo: "",
+    teamOneName: "",
+    teamTwoNmae: "",
     matchDate: "",
     matchTime: "",
     additionalDetails: "",
@@ -30,7 +31,22 @@ const AdminMatchPanel = () => {
       const res = await axios.get("/api/matches", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setMatches(res.data);
+      const formattedMatches = Array.isArray(res.data)
+        ? res.data.map((match) => ({
+          ...match,
+          dateString: match.matchDate,
+          matchDate: new Date(match.matchDate).toLocaleString("en-US", {
+            weekday: "long",
+            month: "long",
+            day: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          }),
+        }))
+        : [];
+      setMatches(formattedMatches);
     } catch (error) {
       console.error("Error fetching matches:", error);
       setMatches([]);
@@ -69,180 +85,262 @@ const AdminMatchPanel = () => {
 
   const handleAddTeam = async () => {
     try {
-      await axios.post("/api/teams", newTeam);
-      alert("Team successfuly added!")
-      fetchTeams();
+      const token = localStorage.getItem("token");
+      await axios.post("/api/teams", newTeam, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      alert("Team successfuly added!");
       window.location.reload();
+      fetchTeams();
     } catch (error) {
       console.error("Error adding team:", error);
     }
   };
 
-  return (
-    <div className="p-6 bg-gray-900 text-white min-h-screen">
-      <h2 className="text-2xl font-bold mb-4">Admin Match Panel</h2>
+  const handleDeclareWinner = async (matchId, declaredWinner) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.put("/api/matches/declare", {
+        matchId, declaredWinner
+      }, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      alert("Winner declared successfully!");
+      window.location.reload();
+      fetchMatches();
+    } catch (error) {
+      console.error("Error adding match:", error);
+    }
+  }
 
-      {/* Add Match Section */}
-      <div className="bg-gray-800 p-6 rounded-lg shadow-md mb-6">
-        <h3 className="text-xl font-semibold mb-4">Add Match</h3>
-        <div className="grid grid-cols-2 gap-4">
-          <select
-            name="teamOne"
-            className="p-2 bg-gray-700 rounded text-white"
-            onChange={handleInputChange}
-          >
-            <option value="">Select Team One</option>
-            {teams.map(team => (
-              <option key={team.teamName} value={team.teamName}>{team.teamName}</option>
-            ))}
-          </select>
-          <select
-            name="teamTwo"
-            className="p-2 bg-gray-700 rounded text-white"
-            onChange={handleInputChange}
-          >
-            <option value="">Select Team Two</option>
-            {teams.map(team => (
-              <option key={team.teamName} value={team.teamName}>{team.teamName}</option>
-            ))}
-          </select>
-          <input
-            type="date"
-            name="matchDate"
-            className="p-2 bg-gray-700 rounded text-white"
-            onChange={handleInputChange}
-          />
-          <input
-            type="time"
-            name="matchTime"
-            className="p-2 bg-gray-700 rounded text-white"
-            onChange={handleInputChange}
-          />
-        </div>
-        <textarea
-          name="additionalDetails"
-          placeholder="Additional Details"
-          className="w-full p-2 bg-gray-700 rounded text-white mt-4"
-          onChange={handleInputChange}
-        ></textarea>
+  const handleEditWinner = (matchId, currentWinner) => {
+    setEditingMatchId(matchId);
+    setEditedWinner(currentWinner);
+  };
+
+  const saveActiveTab = (value) => {
+    setActiveTab(value);
+    localStorage.setItem('adminTab', value);
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-gray-200 py-8 px-4 max-w-6xl mx-auto">
+      <div className="flex flex-col items-center gap-2 mb-8">
+        <h1 className="mx-auto text-3xl text-yellow-400 font-bold">Admin Panel</h1>
+        <p className="text-gray-400">Add teams and matches to roster</p>
+      </div>
+
+      <div className="flex gap-4 mb-6 border-b border-gray-700">
         <button
-          onClick={handleAddMatch}
-          className="mt-4 bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded"
+          className={`py-2 px-4 text-lg font-medium ${activeTab === "match" ? "border-b-2 border-yellow-400 text-yellow-400" : "text-gray-400"
+            }`}
+          onClick={() => saveActiveTab("match")}
         >
           Add Match
         </button>
-      </div>
-
-      {/* Add Team Section */}
-      <div className="bg-gray-800 p-6 rounded-lg shadow-md mb-6">
-        <h3 className="text-xl font-semibold mb-4">Add Team</h3>
-        <input
-          type="text"
-          name="teamName"
-          placeholder="Team Name"
-          className="p-2 bg-gray-700 rounded text-white w-full"
-          onChange={(e) => setNewTeam({ ...newTeam, teamName: e.target.value })}
-        />
-        <input
-          type="text"
-          name="imageUrl"
-          placeholder="Image URL"
-          className="p-2 bg-gray-700 rounded text-white w-full mt-4"
-          onChange={(e) => setNewTeam({ ...newTeam, imageUrl: e.target.value })}
-        />
-        <textarea
-          name="additionalDetails"
-          placeholder="Additional Details"
-          className="w-full p-2 bg-gray-700 rounded text-white mt-4"
-          onChange={(e) => setNewTeam({ ...newTeam, additionalDetails: e.target.value })}
-        ></textarea>
         <button
-          onClick={handleAddTeam}
-          className="mt-4 bg-green-800 hover:bg-green-900 text-white font-bold py-2 px-4 rounded"
+          className={`py-2 px-4 text-lg font-medium ${activeTab === "team" ? "border-b-2 border-yellow-400 text-yellow-400" : "text-gray-400"
+            }`}
+          onClick={() => saveActiveTab("team")}
         >
           Add Team
         </button>
       </div>
-      <div className="bg-gray-800 p-6 rounded-lg shadow-md">
-        <h3 className="text-xl font-semibold mb-4">Existing Matches</h3>
-        {matches.length > 0 ? (
-          <ul className="space-y-4">
-            {matches.map(match => (
-              <li key={match._id} className="p-4 bg-gray-700 rounded flex flex-col gap-2 items-center">
-                {/* Match Title with Logos */}
-                <div className="flex items-center gap-5">
-                  <div className="flex items-center gap-2">
-                    <img src={logo[match.teamOne]} alt={match.teamOne} className="w-8 h-8 rounded-full" />
-                    <p className="text-lg font-semibold">{match.teamOne}</p>
-                  </div>
-                  <p className="text-lg font-semibold">vs</p>
-                  <div className="flex items-center gap-2">
-                    <img src={logo[match.teamTwo]} alt={match.teamTwo} className="w-8 h-8 rounded-full" />
-                    <p className="text-lg font-semibold">{match.teamTwo}</p>
-                  </div>
-                </div>
 
-                {/* Match Date */}
-                <p>{match.matchDate}</p>
+      {/* Add Match Section */}
+      {activeTab == "match" && (
+        <div>
+          <div className="bg-gray-800 p-6 rounded-lg shadow-md mb-6">
+            <div className="grid grid-cols-2 gap-4">
+              <select
+                name="teamOneName"
+                className="p-2 bg-gray-700 rounded text-white"
+                onChange={handleInputChange}
+              >
+                <option value="">Select Team One</option>
+                {teams.map(team => (
+                  <option key={team.teamName} value={team.teamName}>{team.teamName}</option>
+                ))}
+              </select>
+              <select
+                name="teamTwoName"
+                className="p-2 bg-gray-700 rounded text-white"
+                onChange={handleInputChange}
+              >
+                <option value="">Select Team Two</option>
+                {teams.map(team => (
+                  <option key={team.teamName} value={team.teamName}>{team.teamName}</option>
+                ))}
+              </select>
+              <input
+                type="date"
+                name="matchDate"
+                className="p-2 bg-gray-700 rounded text-white"
+                onChange={handleInputChange}
+              />
+              <input
+                type="time"
+                name="matchTime"
+                className="p-2 bg-gray-700 rounded text-white"
+                onChange={handleInputChange}
+              />
+            </div>
+            <textarea
+              name="additionalDetails"
+              placeholder="Additional Details"
+              className="w-full p-2 bg-gray-700 rounded text-white mt-4"
+              onChange={handleInputChange}
+            ></textarea>
+            <button
+              onClick={handleAddMatch}
+              className="mt-4 bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded"
+            >
+              Add Match
+            </button>
+          </div>
 
-                {/* If winner is declared, show winner and Edit button */}
-                {match.declaredWinner ? (
-                  <div className="flex items-center gap-4">
-                    {editingMatchId === match._id ? (
-                      <>
-                        <select
-                          value={editedWinner}
-                          onChange={(e) => setEditedWinner(e.target.value)}
-                          className="p-2 bg-gray-600 rounded"
-                        >
-                          <option value={match.teamOne}>{match.teamOne}</option>
-                          <option value={match.teamTwo}>{match.teamTwo}</option>
-                        </select>
-                        <button
-                          onClick={() => handleDeclareWinner(match._id, editedWinner)}
-                          className="bg-blue-800 hover:bg-blue-900 text-white font-bold py-1 px-4 rounded"
-                        >
-                          Save
-                        </button>
-                      </>
+          <div className="bg-gray-800 p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-4">Existing Matches</h3>
+            {matches.length > 0 ? (
+              <ul className="space-y-4">
+                {matches.map(match => (
+                  <li key={match._id} className="p-4 bg-gray-700 rounded flex flex-col gap-2 items-center">
+                    {/* Match Title with Logos */}
+                    <div className="flex items-center gap-5">
+                      <div className="flex items-center gap-2">
+                        <img src={match.teamOneImage} alt={match.teamOneName} className="w-8 h-8 rounded-full" />
+                        <p className="text-lg font-semibold">{match.teamOneName}</p>
+                      </div>
+                      <p className="text-lg font-semibold">vs</p>
+                      <div className="flex items-center gap-2">
+                        <img src={match.teamTwoImage} alt={match.teamTwoName} className="w-8 h-8 rounded-full" />
+                        <p className="text-lg font-semibold">{match.teamTwoName}</p>
+                      </div>
+                    </div>
+
+                    {/* Match Date */}
+                    <p>{match.matchDate}</p>
+
+                    {/* If winner is declared, show winner and Edit button */}
+                    {match.declaredWinner ? (
+                      <div className="flex items-center gap-4">
+                        {editingMatchId === match._id ? (
+                          <>
+                            <select
+                              value={editedWinner}
+                              onChange={(e) => setEditedWinner(e.target.value)}
+                              className="p-2 bg-gray-600 rounded"
+                            >
+                              <option value={match.teamOne}>{match.teamOneName}</option>
+                              <option value={match.teamTwo}>{match.teamTwoName}</option>
+                            </select>
+                            <button
+                              onClick={() => handleDeclareWinner(match._id, editedWinner)}
+                              className="bg-blue-800 hover:bg-blue-900 text-white font-bold py-1 px-4 rounded"
+                            >
+                              Save
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <p className="text-green-400 font-bold">Winner: {match.declaredWinner}</p>
+                            <button
+                              onClick={() => handleEditWinner(match._id, match.declaredWinner)}
+                              className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-1 px-4 rounded"
+                            >
+                              Edit
+                            </button>
+                          </>
+                        )}
+                      </div>
                     ) : (
-                      <>
-                        <p className="text-green-400 font-bold">Winner: {match.declaredWinner}</p>
+                      <div className="flex gap-2">
                         <button
-                          onClick={() => handleEditWinner(match._id, match.declaredWinner)}
-                          className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-1 px-4 rounded"
+                          onClick={() => handleDeclareWinner(match._id, match.teamOneName)}
+                          className="bg-green-800 hover:bg-green-900 text-white font-bold py-1 px-4 rounded flex items-center gap-2"
                         >
-                          Edit
+                          <img src={match.teamOneImage} alt={match.teamOneName} className="w-6 h-6 rounded-full" />
+                          {match.teamOne} Wins
                         </button>
-                      </>
+                        <button
+                          onClick={() => handleDeclareWinner(match._id, match.teamTwoName)}
+                          className="bg-red-800 hover:bg-red-900 text-white font-bold py-1 px-4 rounded flex items-center gap-2"
+                        >
+                          <img src={match.teamTwoImage} alt={match.teamTwo} className="w-6 h-6 rounded-full" />
+                          {match.teamTwo} Wins
+                        </button>
+                      </div>
                     )}
-                  </div>
-                ) : (
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleDeclareWinner(match._id, match.teamOne)}
-                      className="bg-green-800 hover:bg-green-900 text-white font-bold py-1 px-4 rounded flex items-center gap-2"
-                    >
-                      <img src={logo[match.teamOne]} alt={match.teamOne} className="w-6 h-6 rounded-full" />
-                      {match.teamOne} Wins
-                    </button>
-                    <button
-                      onClick={() => handleDeclareWinner(match._id, match.teamTwo)}
-                      className="bg-red-800 hover:bg-red-900 text-white font-bold py-1 px-4 rounded flex items-center gap-2"
-                    >
-                      <img src={logo[match.teamTwo]} alt={match.teamTwo} className="w-6 h-6 rounded-full" />
-                      {match.teamTwo} Wins
-                    </button>
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
+                  </li>
+                ))}
+              </ul>
 
-        ) : (
-          <p className="text-gray-400">No matches available</p>
-        )}
-      </div>
+            ) : (
+              <p className="text-gray-400">No matches available</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Add Team Section */}
+      {activeTab == "team" && (
+        <div>
+          <div className="bg-gray-800 p-6 rounded-lg shadow-md mb-6">
+            <h3 className="text-xl font-semibold mb-4">Add Team</h3>
+            <input
+              type="text"
+              name="teamName"
+              placeholder="Team Name"
+              className="p-2 bg-gray-700 rounded text-white w-full"
+              onChange={(e) => setNewTeam({ ...newTeam, teamName: e.target.value })}
+            />
+            <input
+              type="text"
+              name="imageUrl"
+              placeholder="Image URL"
+              className="p-2 bg-gray-700 rounded text-white w-full mt-4"
+              onChange={(e) => setNewTeam({ ...newTeam, imageUrl: e.target.value })}
+            />
+            <textarea
+              name="additionalDetails"
+              placeholder="Additional Details"
+              className="w-full p-2 bg-gray-700 rounded text-white mt-4"
+              onChange={(e) => setNewTeam({ ...newTeam, additionalDetails: e.target.value })}
+            ></textarea>
+            <button
+              onClick={handleAddTeam}
+              className="mt-4 bg-green-800 hover:bg-green-900 text-white font-bold py-2 px-4 rounded"
+            >
+              Add Team
+            </button>
+          </div>
+
+          <div className="bg-gray-800 p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-4">Existing Teams</h3>
+            {teams.length > 0 ? (
+              <ul className="space-y-4">
+                {teams.map(team => (
+                  <li key={team._id} className="p-4 bg-gray-700 rounded flex flex-col gap-2 items-center">
+                    <div className="flex items-center gap-2">
+                      <img src={team.imageUrl} alt={team.teamName} className="w-8 h-8 rounded-full" />
+                      <p className="text-lg font-semibold">{team.teamName}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+
+            ) : (
+              <p className="text-gray-400">No teams available</p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

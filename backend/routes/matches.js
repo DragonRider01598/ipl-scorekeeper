@@ -16,21 +16,23 @@ router.get('/', authMiddleware, async (req, res) => {
          .populate('teamTwo', 'teamName imageUrl')
          .populate('declaredWinner', 'teamName');
 
-      const userPredictions = await Score.find({ user: userId }).lean();
+      const userPredictions = await Score.find({ user: userId })
+         .populate('prediction', 'teamName')
+         .lean();
 
       const matchesWithPredictions = matches.map(match => {
          const userPrediction = userPredictions.find(p => p.match.toString() === match._id.toString());
 
          return {
             _id: match._id,
-            teamOne: match.teamOne.teamName,
+            teamOneName: match.teamOne.teamName,
             teamOneImage: match.teamOne.imageUrl,
-            teamTwo: match.teamTwo.teamName,
+            teamTwoName: match.teamTwo.teamName,
             teamTwoImage: match.teamTwo.imageUrl,
             matchDate: match.matchDate,
             additionalDetails: match.additionalDetails,
             declaredWinner: match.declaredWinner ? match.declaredWinner.teamName : null,
-            userPrediction: userPrediction ? userPrediction.prediction : null,
+            userPrediction: userPrediction ? userPrediction.prediction.teamName : null,
             userScore: userPrediction ? userPrediction.score : null,
          };
       });
@@ -45,7 +47,11 @@ router.get('/', authMiddleware, async (req, res) => {
 // Admin endpoint to add a new match
 router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
    try {
-      const { teamOneName, teamTwoName, matchDate, additionalDetails } = req.body;
+      const { teamOneName, teamTwoName, matchDate, matchTime, additionalDetails } = req.body;
+
+      let matchDateTime = new Date(matchDate);
+      const [hours, minutes] = matchTime.split(":").map(Number);
+      matchDateTime.setHours(hours, minutes, 0, 0);
 
       // Fetch team IDs based on team names
       const teamOne = await Team.findOne({ teamName: teamOneName });
@@ -59,7 +65,7 @@ router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
       const newMatch = new Match({
          teamOne: teamOne._id,
          teamTwo: teamTwo._id,
-         matchDate,
+         matchDate: matchDateTime,
          additionalDetails,
       });
 
@@ -78,10 +84,10 @@ router.put('/declare', authMiddleware, adminMiddleware, async (req, res) => {
       if (!match) return res.status(404).json({ msg: 'Match not found' });
       const team = await Team.findOne({ teamName: declaredWinner });
       if (!team) return res.status(404).json({ msg: 'Team not found' });
-      
+
       if (!(team._id.equals(match.teamOne) || team._id.equals(match.teamTwo))) {
          return res.status(400).json({ msg: 'Team not participating in this match' });
-       }
+      }
 
       match.declaredWinner = team._id;
       await match.save();
