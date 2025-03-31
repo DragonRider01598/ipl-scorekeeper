@@ -82,7 +82,7 @@ const MatchPrediction = () => {
                }),
             }))
             : [];
-         setMatches(formattedMatches.filter((match) => new Date(match.dateString) >= now));
+         setMatches(formattedMatches.filter((match) => new Date(match.dateString) >= now).reverse());
          setPastMatches(formattedMatches.filter((match) => new Date(match.dateString) < now));
       } catch (error) {
          console.error("Error fetching matches:", error);
