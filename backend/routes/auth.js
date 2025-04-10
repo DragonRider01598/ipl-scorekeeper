@@ -3,12 +3,12 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
+const sendPasswordResetEmail = require("../utils/sendPasswordResetEmail.js");
 
 const router = express.Router();
 
 // Register Route
-router.post(
-   '/register',
+router.post('/register',
    [
       body('username').notEmpty().withMessage('Username is required'),
       body('email').isEmail().withMessage('Invalid email format').normalizeEmail(),
@@ -41,8 +41,7 @@ router.post(
 );
 
 // Login Route
-router.post(
-   '/login',
+router.post('/login',
    [
       body('email').isEmail().withMessage('Invalid email format').normalizeEmail(),
       body('password').notEmpty().withMessage('Password is required'),
@@ -63,7 +62,7 @@ router.post(
          if (!isMatch) return res.status(400).json({ msg: 'Invalid credentials' });
 
          // Generate JWT Token
-         const payload = { id: user._id, username: user.username, role: user.role };
+         const payload = { id: user._id, username: user.username, role: user.role, tokenVersion: user.tokenVersion };
 
          const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '90d' });
 
@@ -73,15 +72,80 @@ router.post(
       }
    }
 );
+
+// Authorization
 router.get('/verify', async (req, res) => {
-   const token = req.headers.authorization && req.headers.authorization.split(" ")[1];
+   const token = req.headers.authorization?.split(" ")[1];
    if (!token) return res.status(401).json({ msg: "No token, authorization denied" });
 
    try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      res.json({ valid: true, user: decoded });
+      const user = await User.findById(decoded.id);
+
+      if (!user) return res.status(404).json({ msg: "User not found" });
+
+      if (decoded.tokenVersion !== user.tokenVersion) {
+         return res.status(401).json({ msg: "Session expired. Please log in again." });
+      }
+
+      res.status(200).json({ valid: true, user: decoded });
    } catch (error) {
       res.status(401).json({ valid: false, msg: "Token is not valid" });
+   }
+});
+
+// Forgot Password (send link)
+router.post('/forgot-password', async (req, res) => {
+   const { email } = req.body;
+   const user = await User.findOne({ email });
+
+   if (!user) {
+      return res.status(200).json({ msg: "Reset link sent if email exists" });
+   }
+
+   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '15m' });
+   const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+
+   user.resetToken = token;
+   user.resetTokenExpiry = Date.now() + 15 * 60 * 1000;
+   await user.save();
+
+   await sendPasswordResetEmail({
+      to: user.email,
+      userName: user.username || "User",
+      resetLink,
+   });
+
+   res.status(200).json({ msg: "Reset link sent if email exists" });
+});
+
+// Reset Password (handle submission)
+router.post('/reset-password', async (req, res) => {
+   const { token, newPassword } = req.body;
+
+   try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await User.findById(decoded.userId);
+
+      if (
+         !user || !user.resetToken || !user.resetTokenExpiry ||
+         user.resetToken !== token ||
+         user.resetTokenExpiry < Date.now()
+      ) {
+         return res.status(400).json({ msg: "Invalid or expired token" });
+      }
+
+      const hashed = await bcrypt.hash(newPassword, 12);
+      user.password = hashed;
+      user.resetToken = undefined;
+      user.resetTokenExpiry = undefined;
+      user.tokenVersion += 1;
+      await user.save();
+
+      res.status(200).json({ msg: "Password has been reset successfully" });
+   } catch (err) {
+      console.error("Token error:", err);
+      return res.status(400).json({ msg: "Reset token is invalid or expired" });
    }
 });
 
