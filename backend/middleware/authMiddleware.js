@@ -10,7 +10,7 @@ const authMiddleware = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (error) {
-    res.status(401).json({ msg: 'Token is not valid' });
+    res.status(401).json({ msg: 'Token is not valid' , wow: error});
   }
 };
 

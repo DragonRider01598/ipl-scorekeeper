@@ -1,6 +1,7 @@
 const express = require('express');
 const Score = require('../models/Score');
 const Match = require('../models/Match');
+const Team = require('../models/Team');
 const { authMiddleware } = require('../middleware/authMiddleware');
 
 const router = express.Router();
@@ -8,20 +9,16 @@ const router = express.Router();
 router.get('/:matchId', async (req, res) => {
   const { matchId } = req.params;
   try {
-    // Find all predictions for the given match and populate user details
-    const predictions = await Score.find({ match: matchId }).populate('user', 'username');
+    // Find all predictions for the given match and populate user details and team details
+    const predictions = await Score.find({ match: matchId }).populate('user', 'username').populate('prediction', 'teamName');
 
-    // Group predictions by the predicted team
+    // Group predictions by the predicted team name
     const grouped = predictions.reduce((acc, curr) => {
-      const team = curr.prediction;
-      if (!acc[team]) {
-        acc[team] = [];
+      const teamName = curr.prediction.teamName;
+      if (!acc[teamName]) {
+        acc[teamName] = [];
       }
-      // Add the user's basic info (username, id) to the corresponding team group
-      acc[team].push({
-        userId: curr.user._id,
-        username: curr.user.username
-      });
+      acc[teamName].push(curr.user.username);
       return acc;
     }, {});
 
@@ -50,9 +47,15 @@ router.post('/', authMiddleware, async (req, res) => {
 
     // Check if a prediction already exists for this user and match
     let scoreEntry = await Score.findOne({ user: req.user.id, match: matchId });
+    const team = await Team.findOne({ teamName: prediction });
+
+    if (!(team._id.equals(match.teamOne) || team._id.equals(match.teamTwo))) {
+      return res.status(400).json({ msg: 'Team not participating in this match' });
+    }
+
     if (scoreEntry) {
       // Update existing prediction if needed
-      scoreEntry.prediction = prediction;
+      scoreEntry.prediction = team._id;
       await scoreEntry.save();
       return res.json({ msg: 'Prediction updated', scoreEntry });
     }
@@ -61,7 +64,7 @@ router.post('/', authMiddleware, async (req, res) => {
     scoreEntry = new Score({
       user: req.user.id,
       match: matchId,
-      prediction,
+      prediction: team._id,
     });
     await scoreEntry.save();
     res.status(201).json({ msg: 'Prediction submitted', scoreEntry });

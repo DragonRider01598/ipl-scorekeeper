@@ -22,6 +22,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/matches', require('./routes/matches'));
 app.use('/api/scoreboard', require('./routes/scoreboard'));
 app.use('/api/predictions', require('./routes/matchPredictions'));
+app.use('/api/teams', require('./routes/teams'));
 
 app.use(express.static(path.join(__dirname, "../frontend/dist")));
 app.get("*", (req, res) => {
