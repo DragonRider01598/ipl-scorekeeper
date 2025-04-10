@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { useContext, useEffect } from "react";
 import Login from "./pages/Login";
+import ForgotPassword from "./pages/ForgotPassword";
 import Register from "./pages/Register";
 import AdminDashboard from "./pages/AdminDashboard";
 import MatchPrediction from "./pages/MatchPrediction";
@@ -9,6 +10,7 @@ import NotFound from "./pages/NotFound";
 import { AuthProvider, AuthContext } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
 import './App.css';
+import ResetPassword from "./pages/ResestPassword";
 
 
 export default function App() {
@@ -22,6 +24,8 @@ export default function App() {
             <Route path="/match-prediction" element={<ProtectedRoute element={<MatchPrediction />} />} />
             <Route path="/admin" element={<ProtectedRoute element={<AdminDashboard />} adminOnly />} />
             <Route path="/login" element={<GuestRoute element={<Login />} />} />
+            <Route path="/forgot-password" element={<GuestRoute element={<ForgotPassword />} />} />
+            <Route path="/reset-password" element={<GuestRoute element={<ResetPassword />} />} />
             <Route path="/register" element={<GuestRoute element={<Register />} />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
