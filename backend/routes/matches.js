@@ -23,17 +23,21 @@ router.get('/', authMiddleware, async (req, res) => {
       const matchesWithPredictions = matches.map(match => {
          const userPrediction = userPredictions.find(p => p.match.toString() === match._id.toString());
 
+         const teamOne = match.teamOne;
+         const teamTwo = match.teamTwo;
+         const winner = match.declaredWinner;
+
          return {
             _id: match._id,
-            teamOneName: match.teamOne.teamName,
-            teamOneImage: match.teamOne.imageUrl,
-            teamTwoName: match.teamTwo.teamName,
-            teamTwoImage: match.teamTwo.imageUrl,
+            teamOneName: teamOne ? teamOne.teamName : 'T1',
+            teamOneImage: teamOne ? teamOne.imageUrl : null,
+            teamTwoName: teamTwo ? teamTwo.teamName : 'T2',
+            teamTwoImage: teamTwo ? teamTwo.imageUrl : null,
             matchDate: match.matchDate,
             additionalDetails: match.additionalDetails,
-            declaredWinner: match.declaredWinner ? match.declaredWinner.teamName : null,
-            userPrediction: userPrediction ? userPrediction.prediction.teamName : null,
-            userScore: userPrediction ? userPrediction.score : null,
+            declaredWinner: winner ? winner.teamName : null,
+            userPrediction: userPrediction?.prediction?.teamName || null,
+            userScore: userPrediction?.score || null,
          };
       });
 
@@ -92,6 +96,21 @@ router.put('/declare', authMiddleware, adminMiddleware, async (req, res) => {
       match.declaredWinner = team._id;
       await match.save();
       res.json({ msg: 'Winner declared successfully', match });
+   } catch (error) {
+      res.status(500).json({ msg: error.message });
+   }
+});
+
+// Admin ednpoint to delete a match
+router.delete('/:matchId', authMiddleware, adminMiddleware, async (req, res) => {
+   const { matchId } = req.params;
+
+   try {
+      const deletedMatch = await Match.findByIdAndDelete(matchId);
+
+      if (!deletedMatch) return res.status(404).json({ msg: 'Match not found' });
+
+      res.json({ msg: 'Match deleted successfully' });
    } catch (error) {
       res.status(500).json({ msg: error.message });
    }
