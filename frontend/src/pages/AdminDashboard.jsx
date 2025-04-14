@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Trash2 } from "lucide-react";
 
 const AdminMatchPanel = () => {
   const [matches, setMatches] = useState([]);
@@ -99,6 +100,22 @@ const AdminMatchPanel = () => {
     setEditedWinner(currentWinner);
   };
 
+  const handleDeleteMatch = async (matchId) => {
+    const confirmDelete = window.confirm("Delete this match?");
+    if (!confirmDelete) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`/api/matches/${matchId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      alert("Match deleted successfully!");
+      fetchMatches();
+    } catch (error) {
+      console.error("Error deleting match:", error);
+    }
+  };
+
   return (
     <div className="p-6 bg-gray-900 text-white min-h-screen">
       <h2 className="text-2xl font-bold mb-4">Admin Match Panel</h2>
@@ -161,7 +178,16 @@ const AdminMatchPanel = () => {
         {matches.length > 0 ? (
           <ul className="space-y-4">
             {matches.map(match => (
-              <li key={match._id} className="p-4 bg-gray-700 rounded flex flex-col gap-2 items-center">
+              <li key={match._id} className="relative p-4 bg-gray-700 rounded flex flex-col gap-2 items-center">
+                {/* Delete Button */}
+                <button
+                  onClick={() => handleDeleteMatch(match._id)}
+                  className="absolute top-5 right-5 text-red-400 hover:text-red-600 hover:bg-gray-600 p-2 rounded-xl cursor-pointer"
+                  title="Delete Match"
+                >
+                  <Trash2 size={24} />
+                </button>
+
                 {/* Match Title with Logos */}
                 <div className="flex items-center gap-5">
                   <div className="flex items-center gap-2">

@@ -70,4 +70,19 @@ router.put('/declare/:matchId', authMiddleware, adminMiddleware, async (req, res
    }
 });
 
+// Admin ednpoint to delete a match
+router.delete('/:matchId', authMiddleware, adminMiddleware, async (req, res) => {
+   const { matchId } = req.params;
+
+   try {
+      const deletedMatch = await Match.findByIdAndDelete(matchId);
+
+      if (!deletedMatch) return res.status(404).json({ msg: 'Match not found' });
+
+      res.json({ msg: 'Match deleted successfully' });
+   } catch (error) {
+      res.status(500).json({ msg: error.message });
+   }
+});
+
 module.exports = router;
