@@ -46,7 +46,7 @@ const MatchPrediction = () => {
          );
          alert(response.data.msg); // Show success message
          setSelectedMatch(null);
-         window.location.reload();
+         fetchMatches();
       } catch (error) {
          alert(response.data.msg);
       } finally {
