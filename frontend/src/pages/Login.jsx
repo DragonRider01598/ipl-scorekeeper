@@ -73,6 +73,18 @@ const Login = () => {
               </div>
             </div>
 
+
+            {/* Forgot password */}
+            <div className="text-right -mt-4 mb-3">
+              <Link
+                to="/forgot-password"
+                className="text-sm text-blue-400 hover:text-blue-300 font-medium transition-colors duration-200"
+              >
+                Forgot your password?
+              </Link>
+            </div>
+
+
             {/* Submit Button */}
             <button
               type="submit"
