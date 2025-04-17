@@ -33,7 +33,7 @@ const MatchPrediction = () => {
          );
          alert(response.data.msg); // Show success message
          setSelectedMatch(null);
-         window.location.reload();
+         fetchMatches();
       } catch (error) {
          alert(response.data.msg);
       } finally {
@@ -192,8 +192,8 @@ const MatchPrediction = () => {
                                     onChange={handleChange}
                                  >
                                     <option value="">Select winner</option>
-                                    <option value={selectedMatch.teamOne}>{selectedMatch.teamOne}</option>
-                                    <option value={selectedMatch.teamTwo}>{selectedMatch.teamTwo}</option>
+                                    <option value={selectedMatch.teamOneName}>{selectedMatch.teamOneName}</option>
+                                    <option value={selectedMatch.teamTwoName}>{selectedMatch.teamTwoName}</option>
                                  </select>
                                  <button
                                     className="mt-4 w-full bg-yellow-600 hover:bg-yellow-700 text-black py-3 rounded-lg font-medium"

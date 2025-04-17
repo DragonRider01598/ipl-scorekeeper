@@ -79,7 +79,6 @@ const AdminMatchPanel = () => {
         },
       });
       alert("Match added successfully!");
-      window.location.reload();
       fetchMatches();
     } catch (error) {
       console.error("Error adding match:", error);
@@ -96,7 +95,6 @@ const AdminMatchPanel = () => {
         },
       });
       alert("Team successfuly added!");
-      window.location.reload();
       fetchTeams();
     } catch (error) {
       console.error("Error adding team:", error);
@@ -148,7 +146,6 @@ const AdminMatchPanel = () => {
         },
       });
       alert("Winner declared successfully!");
-      window.location.reload();
       fetchMatches();
     } catch (error) {
       console.error("Error adding match:", error);
@@ -166,8 +163,7 @@ const AdminMatchPanel = () => {
   }
 
   const handleDeleteMatch = async (matchId) => {
-    const confirmDelete = window.confirm("Delete this match?");
-    if (!confirmDelete) return;
+    if (!window.confirm('Delete this match?')) return;
 
     try {
       const token = localStorage.getItem("token");
